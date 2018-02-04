@@ -14,14 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 /*
  * NOTE : =============================================================
@@ -114,6 +107,10 @@ public class AddressBook {
     private static final String COMMAND_LIST_WORD = "list";
     private static final String COMMAND_LIST_DESC = "Displays all persons as a list with index numbers.";
     private static final String COMMAND_LIST_EXAMPLE = COMMAND_LIST_WORD;
+
+    private static final String COMMAND_LIST_SORTED_WORD = "sort";
+    private static final String COMMAND_LIST_SORTED_DESC = "Sort and displays all persons as a list with index numbers.";
+    private static final String COMMAND_LIST_SORTED_EXAMPLE = COMMAND_LIST_SORTED_WORD;
 
     private static final String COMMAND_DELETE_WORD = "delete";
     private static final String COMMAND_DELETE_DESC = "Deletes a person identified by the index number used in "
@@ -375,6 +372,8 @@ public class AddressBook {
             return executeFindPersons(commandArgs);
         case COMMAND_LIST_WORD:
             return executeListAllPersonsInAddressBook();
+        case COMMAND_LIST_SORTED_WORD:
+            return executeSortAndListAllPersonsInAddressBook();
         case COMMAND_DELETE_WORD:
             return executeDeletePerson(commandArgs);
         case COMMAND_CLEAR_WORD:
@@ -577,6 +576,38 @@ public class AddressBook {
         ArrayList<String[]> toBeDisplayed = getAllPersonsInAddressBook();
         showToUser(toBeDisplayed);
         return getMessageForPersonsDisplayedSummary(toBeDisplayed);
+    }
+
+    /**
+     * Displays a sorted list of all persons in the address book to the user; in alphabetical order of their names.
+     *
+     * @return feedback display message for the operation result
+     */
+    private static String executeSortAndListAllPersonsInAddressBook() {
+        ArrayList<String[]> toBeDisplayed = sortByName(getAllPersonsInAddressBook());
+        showToUser(toBeDisplayed);
+        return getMessageForPersonsDisplayedSummary(toBeDisplayed);
+    }
+
+    /**
+     * Sorts the list of persons in the address book based on alphabetical order of their names.
+     * @param allPersons
+     * @return sorted version of allPerson
+     */
+    private static ArrayList<String[]> sortByName (ArrayList<String[]> allPersons) {
+        ArrayList<String[]> copy = (ArrayList<String[]>) allPersons.clone();
+        Collections.sort(copy, new SortByName());
+        return copy;
+    }
+
+    /**
+     * Inner class as a comparator.
+     * Sorts array of strings based on first element alphabetically.
+     */
+    static class SortByName implements Comparator<String[]> {
+        public int compare(String[] a, String[] b) {
+            return a[0].compareTo(b[0]);
+        }
     }
 
     /**
